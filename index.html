@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Load JSON Test</title>
+</head>
+<body>
+    <h1>Load JSON Test</h1>
+    <div id="content"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('test.json')
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the JSON data
+                    console.log(data);
+                    document.getElementById('content').innerText = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error('Error loading JSON:', error));
+        });
+    </script>
+</body>
+</html>
