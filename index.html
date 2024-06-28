@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+    </style>
     <script src="script.js"></script>
 </head>
+
 <body>
     <div>
         <ul>
@@ -14,6 +27,130 @@
         </ul>
     </div>
     <h1>Calculator</h1>
+    <table>
+        <tr>
+            <th>Oasis (in order)</th>
+            <th>Wood</th>
+            <th>Clay</th>
+            <th>Iron</th>
+            <th>Crop</th>
+        </tr>
+
+        <tr>
+            <th>1</th>
+            <th>
+                <select name="wood1" id="wood1">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="clay1" id="clay1">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="iron1" id="iron1">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="crop1" id="crop1">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+        </tr>
+
+        <tr>
+            <th>2</th>
+            <th>
+                <select name="wood2" id="wood2">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="clay2" id="clay2">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="iron2" id="iron2">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="crop2" id="crop2">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+        </tr>
+
+        <tr>
+            <th>3</th>
+            <th>
+                <select name="wood3" id="wood3">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="clay3" id="clay3">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="iron3" id="iron3">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+            <th>
+                <select name="crop3" id="crop3">
+                    <option value=0>0%</option>
+                    <option value=0.25>25%</option>
+                    <option value=0.5>50%</option>
+                </select>
+            </th>
+        </tr>
+    </table>
+    <input type="checkbox" id="isCapital" name="isCapital" checked />
+    <label for="isCapital">Is Capital?</label><br>
+    <label for="villageType">Village type:</label>
+    <select name="villageType" id="villageType">
+        <option value=0>Crop 15</option>
+        <option value=1>Crop 9</option>
+        <option value=2>Crop 7 no wood</option>
+        <option value=3>Crop 7 no clay</option>
+        <option value=4>Crop 7 no iron</option>
+        <option value=5>Crop 6</option>
+        <option value=6>Crop 6 wood no clay</option>
+        <option value=7>Crop 6 wood no iron</option>
+        <option value=8>Crop 6 clay no wood</option>
+        <option value=9>Crop 6 clay no iron</option>
+        <option value=10>Crop 6 iron no wood</option>
+        <option value=11>Crop 6 iron no clay</option>
+    </select>
+    <input id="calculateButton" type="button" value="Calculate" />
     <div id="content"></div>
 </body>
+
 </html>

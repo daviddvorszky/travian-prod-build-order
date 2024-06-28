@@ -42,7 +42,7 @@ const buildingLimits = [
     { 'Bakery': 1, 'Brickyard': 1, 'Clay Pit': 3, 'Cropland': 6, 'Grain Mill': 1, 'Iron Foundry': 1, 'Iron Mine': 5, 'Sawmill': 1, 'Woodcutter': 4, 'Hero\'s Mansion': 1 },
 ];
 
-const maxLevels = {
+const maxLevelsDefault = {
     'Bakery': 5,
     'Brickyard': 5,
     'Clay Pit': 10,
@@ -53,7 +53,15 @@ const maxLevels = {
     'Sawmill': 5,
     'Woodcutter': 10,
     'Hero\'s Mansion': 3,
+};
+
+const herosMansionMap = {
+    1: 10,
+    2: 15,
+    3: 20,
 }
+
+var maxLevels = {};
 
 var buildingData = [];
 const oases = [
@@ -114,6 +122,9 @@ function calculateProduction(buildings, hasBonus = false) {
         } else if (building.type == "Iron Mine") {
             ironProduction += buildingData[building.type][building.level].prod;
         } else if (building.type == "Cropland") {
+            if(building.level == 23){
+                console.log(building);
+            }
             cropProduction += buildingData[building.type][building.level].prod;
         }
     }
@@ -158,6 +169,9 @@ function calculateProduction(buildings, hasBonus = false) {
 function calculatePaybackPeriods(buildings, hasBonus = false) {
     const currentProduction = calculateProduction(buildings, hasBonus);
     buildings.forEach(building => {
+        if(!building.canBeUpgraded){
+            return;
+        }
         const currentLevel = building.level;
         building.level += 1;
         const newProduction = calculateProduction(buildings, hasBonus);
@@ -174,16 +188,74 @@ function getBuildingWithLowestPaybackPeriod(buildings) {
     const minValidObject = buildings.reduce((min, obj) => {
         if (!obj.canBeUpgraded) return min; // Skip invalid objects
         return (min === null || obj.paybackPeriod < min.paybackPeriod) ? obj : min;
-      }, null);
-      return minValidObject;
+    }, null);
+    return minValidObject;
 }
 
 function isThereAnyBuildingToUpgrade(buildings) {
     return buildings.some(building => building.canBeUpgraded == true);
 }
 
-document.addEventListener("DOMContentLoaded", async function () {
+function setOasesValues(){
+    const wood1 = document.getElementById("wood1");
+    const clay1 = document.getElementById("clay1");
+    const iron1 = document.getElementById("iron1");
+    const crop1 = document.getElementById("crop1");
+    const wood2 = document.getElementById("wood2");
+    const clay2 = document.getElementById("clay2");
+    const iron2 = document.getElementById("iron2");
+    const crop2 = document.getElementById("crop2");
+    const wood3 = document.getElementById("wood3");
+    const clay3 = document.getElementById("clay3");
+    const iron3 = document.getElementById("iron3");
+    const crop3 = document.getElementById("crop3");
+
+    oases[1].wood = parseFloat(wood1.value);
+    oases[1].clay = parseFloat(clay1.value);
+    oases[1].iron = parseFloat(iron1.value);
+    oases[1].crop = parseFloat(crop1.value);
+    oases[2].wood = parseFloat(wood2.value);
+    oases[2].clay = parseFloat(clay2.value);
+    oases[2].iron = parseFloat(iron2.value);
+    oases[2].crop = parseFloat(crop2.value);
+    oases[3].wood = parseFloat(wood3.value);
+    oases[3].clay = parseFloat(clay3.value);
+    oases[3].iron = parseFloat(iron3.value);
+    oases[3].crop = parseFloat(crop3.value);
+}
+
+function writeData() {
     const content = document.getElementById('content');
+    content.innerHTML = '';
+    const villageTypeField = document.getElementById("villageType");
+    const villageType = villageTypeField.value;
+    const isCapitalCheckbox = document.getElementById('isCapital');
+    const isCapital = isCapitalCheckbox.checked;
+
+    maxLevels = structuredClone(maxLevelsDefault);
+    if(isCapital){
+        maxLevels['Woodcutter'] = 22;
+        maxLevels['Clay Pit'] = 22;
+        maxLevels['Iron Mine'] = 22;
+        maxLevels['Cropland'] = 22;
+    }
+
+    setOasesValues();
+
+    const buildings = setupBuildings(villageType);
+    while (isThereAnyBuildingToUpgrade(buildings)) {
+        const toUpgrade = getBuildingWithLowestPaybackPeriod(buildings);
+        toUpgrade.level += 1;
+        if (toUpgrade.level == maxLevels[toUpgrade.type]) {
+            toUpgrade.canBeUpgraded = false;
+        }
+        const buildingName = toUpgrade.type;
+        const buildingLevel = buildingName == 'Hero\'s Mansion' ? herosMansionMap[toUpgrade.level] : toUpgrade.level;
+        content.innerHTML += `Upgrade ${buildingName} to ${buildingLevel}<br>`;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async function () {
     const promises = filenames.map(loadJson);
     const response = await Promise.all(promises);
     for (let dataKey in response) {
@@ -192,15 +264,5 @@ document.addEventListener("DOMContentLoaded", async function () {
         value = data[key];
         buildingData[key] = value;
     }
-    const buildings = setupBuildings(villageTypes.wheat_6);
-    while(isThereAnyBuildingToUpgrade(buildings)) {
-        const toUpgrade = getBuildingWithLowestPaybackPeriod(buildings);
-        toUpgrade.level += 1;
-        if(toUpgrade.level == maxLevels[toUpgrade.type]){
-            toUpgrade.canBeUpgraded = false;
-        }
-        const buildingName = toUpgrade.type;
-        const buildingLevel = buildingName == 'Hero\'s Mansion' ? 'asd' : toUpgrade.level;
-        content.innerHTML += `Upgrade ${buildingName} to ${buildingLevel}<br>`;
-    }
+    document.getElementById("calculateButton").onclick = writeData;
 });
