@@ -1,5 +1,13 @@
 {
     "Clay pit": {
+        "0": {
+            "wood": 0,
+            "clay": 0,
+            "iron": 0,
+            "wheat": 0,
+            "total": 0,
+            "prod": 6
+        },
         "1": {
             "wood": 80,
             "clay": 40,

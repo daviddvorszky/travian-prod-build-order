@@ -1,5 +1,13 @@
 {
     "Brickyard": {
+        "0": {
+            "wood": 0,
+            "clay": 0,
+            "iron": 0,
+            "wheat": 0,
+            "total": 0,
+            "prod": 1.0
+        },
         "1": {
             "wood": 440,
             "clay": 480,
