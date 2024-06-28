@@ -1,4 +1,4 @@
-files = [
+const files = [
     'bakery.json',
     'brickyard.json',
     'clay_pit.json',
@@ -9,7 +9,7 @@ files = [
     'sawmill.json',
     'woodcutter.json',
     'heros_mansion.json'
-]
+];
 
 function addTable(data) {
     const content = document.getElementById('content');
@@ -22,8 +22,8 @@ function addTable(data) {
         const tbody = document.createElement('tbody');
 
         // Extract headers dynamically
-        const firstKey = Object.keys(data[0])[0];
-        const headers = Object.keys(data[0][firstKey][0]);
+        const firstLevel = Object.keys(data)[0];
+        const headers = Object.keys(data[firstLevel]);
 
         // Create table headers
         const headerRow = document.createElement('tr');
@@ -39,26 +39,24 @@ function addTable(data) {
         thead.appendChild(headerRow);
 
         // Create table rows from JSON data
-        data.forEach(entry => {
-            for (let level in entry) {
-                if (entry.hasOwnProperty(level)) {
-                    const levelData = entry[level][0];
-                    const row = document.createElement('tr');
+        for (let level in data) {
+            if (data.hasOwnProperty(level)) {
+                const levelData = data[level];
+                const row = document.createElement('tr');
 
-                    const levelCell = document.createElement('td');
-                    levelCell.textContent = level;
-                    row.appendChild(levelCell);
+                const levelCell = document.createElement('td');
+                levelCell.textContent = level;
+                row.appendChild(levelCell);
 
-                    headers.forEach(header => {
-                        const cell = document.createElement('td');
-                        cell.textContent = levelData[header];
-                        row.appendChild(cell);
-                    });
+                headers.forEach(header => {
+                    const cell = document.createElement('td');
+                    cell.textContent = levelData[header];
+                    row.appendChild(cell);
+                });
 
-                    tbody.appendChild(row);
-                }
+                tbody.appendChild(row);
             }
-        });
+        }
 
         table.appendChild(thead);
         table.appendChild(tbody);
@@ -73,7 +71,7 @@ function addTable(data) {
     }
 }
 
-function loadJson(fileName, index) {
+function loadJson(fileName) {
     fetch(`data/${fileName}`)
         .then(response => response.json())
         .then(data => {
