@@ -1,3 +1,5 @@
+// Don't look at this code, it's disgusting
+
 const filenames = [
     'bakery.json',
     'brickyard.json',
@@ -10,6 +12,8 @@ const filenames = [
     'woodcutter.json',
     'heros_mansion.json',
 ];
+
+var villages = [];
 
 const villageTypes = Object.freeze({
     wheat_15: 0,
@@ -54,6 +58,8 @@ const maxLevelsDefault = {
     "Hero's Mansion": 3,
 };
 
+const buildingLevels = [];
+
 const herosMansionMap = {
     1: 10,
     2: 15,
@@ -62,14 +68,13 @@ const herosMansionMap = {
 
 let maxLevels = {};
 let buildingData = [];
-const oases = [
+let buildings = [];
+let oases = [
     { wood: 0, clay: 0, iron: 0, crop: 0 },
-    { wood: 0, clay: 0, iron: 0.25, crop: 0.25 },
+    { wood: 0, clay: 0, iron: 0, crop: 0 },
     { wood: 0, clay: 0, iron: 0, crop: 0 },
     { wood: 0, clay: 0, iron: 0, crop: 0 },
 ];
-
-const deepcopy = (obj) => JSON.parse(JSON.stringify(obj));
 
 const loadJson = async (fileName) => {
     try {
@@ -81,7 +86,7 @@ const loadJson = async (fileName) => {
 };
 
 const setupBuildings = (villageType) => {
-    const buildings = [];
+    buildings = [];
     for (const [buildingType, limit] of Object.entries(buildingLimits[villageType])) {
         for (let i = 0; i < limit; i++) {
             buildings.push({
@@ -180,7 +185,7 @@ const getBuildingWithLowestPaybackPeriod = (buildings) => {
 
 const isThereAnyBuildingToUpgrade = (buildings) => buildings.some(building => building.canBeUpgraded);
 
-const setOasesValues = () => {
+const updateOasesValues = () => {
     oases[1].wood = parseFloat(document.getElementById("wood1").value);
     oases[1].clay = parseFloat(document.getElementById("clay1").value);
     oases[1].iron = parseFloat(document.getElementById("iron1").value);
@@ -195,10 +200,23 @@ const setOasesValues = () => {
     oases[3].crop = parseFloat(document.getElementById("crop3").value);
 };
 
+const updateOasesDropdowns = () => {
+    document.getElementById("wood1").value = oases[1].wood;
+    document.getElementById("clay1").value = oases[1].clay;
+    document.getElementById("iron1").value = oases[1].iron;
+    document.getElementById("crop1").value = oases[1].crop;
+    document.getElementById("wood2").value = oases[2].wood;
+    document.getElementById("clay2").value = oases[2].clay;
+    document.getElementById("iron2").value = oases[2].iron;
+    document.getElementById("crop2").value = oases[2].crop;
+    document.getElementById("wood3").value = oases[3].wood;
+    document.getElementById("clay3").value = oases[3].clay;
+    document.getElementById("iron3").value = oases[3].iron;
+    document.getElementById("crop3").value = oases[3].crop;
+}
+
 const writeData = () => {
     const content = document.getElementById('content');
-    content.innerHTML = '';
-    const villageType = document.getElementById("villageType").value;
     const isCapital = document.getElementById('isCapital').checked;
 
     maxLevels = { ...maxLevelsDefault };
@@ -209,9 +227,10 @@ const writeData = () => {
         maxLevels.Cropland = 22;
     }
 
-    setOasesValues();
-    const buildings = setupBuildings(villageType);
+    updateOasesValues();
 
+    const buildingsStartingState = structuredClone(buildings);
+    document.getElementById("content").innerHTML = '';
     while (isThereAnyBuildingToUpgrade(buildings)) {
         const toUpgrade = getBuildingWithLowestPaybackPeriod(buildings);
         toUpgrade.level += 1;
@@ -222,7 +241,151 @@ const writeData = () => {
         const buildingLevel = buildingName === "Hero's Mansion" ? herosMansionMap[toUpgrade.level] : toUpgrade.level;
         content.innerHTML += `Upgrade ${buildingName} to ${buildingLevel}<br>`;
     }
+    buildings = buildingsStartingState;
 };
+
+const saveVillage = (villageName) => {
+    if(!villageName || typeof villageName != "string"){
+        villageName = document.getElementById("villageSelector").value;
+    }
+    if(!villageName){
+        return;
+    }
+    const existingVillage = villages.find(v => v.villageName === villageName);
+    if (existingVillage) {
+        const index = villages.indexOf(existingVillage);
+        villages.splice(index, 1);
+    }
+    const villageType = document.getElementById("villageType").value;
+    const levels = [];
+    index = 0;
+    buildings.forEach(building => {
+        const buildingTextfield = document.getElementById("building" + index++);
+        const level = buildingTextfield ? parseInt(buildingTextfield.value) : 0;
+        levels.push(level);
+    });
+    const isCapital = document.getElementById('isCapital').checked;
+    updateOasesValues();
+    const village = {
+        "villageName": villageName,
+        "villageType": villageType,
+        "levels": levels,
+        "isCapital": isCapital,
+        "oases": oases,
+    };
+    villages.push(village);
+    localStorage.setItem("villages", JSON.stringify(villages));
+};
+
+const createVillage = () => {
+    const villageName = document.getElementById("villageName").value;
+    const existingVillage = villages.find(v => v.villageName === villageName);
+    if (existingVillage) {
+        document.getElementById("warningText").innerHTML = "This village exists already.";
+        return;
+    }
+    saveVillage(villageName);
+    loadVillages();
+    document.getElementById("villageName").value = "";
+};
+
+
+const loadVillages = () => {
+    villages = JSON.parse(localStorage.getItem("villages"));
+    const villageSelector = document.getElementById("villageSelector");
+    villageSelector.innerHTML = '';
+    if (villages == null) {
+        villages = [];
+    }
+    if (villages.length == 0) {
+        const villageOption = document.createElement("option");
+        villageOption.value = null;
+        villageOption.innerHTML = "Create a village first";
+        villageSelector.appendChild(villageOption);
+        return;
+    }
+    villageSelector.innerHTML = '';
+    Object.values(villages).forEach(village => {
+        const villageName = village.villageName;
+        const villageOption = document.createElement("option");
+        villageOption.value = villageName;
+        villageOption.innerHTML = villageName;
+        villageSelector.appendChild(villageOption);
+    });
+}
+
+const loadCurrentVillage = (villageName) => {
+    let village = villages.find(v => v.villageName === villageName);
+    if(!village){
+        village = {
+            villageTypes: document.getElementById("villageType").value,
+            levels: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            oases: oases,
+        };
+    }
+    levels = village.levels;
+    const currentLevelsDiv = document.getElementById("currentLevels");
+    currentLevelsDiv.innerHTML = '';
+    const table = document.createElement("table");
+    currentLevelsDiv.appendChild(table);
+    const headerRow = document.createElement("tr");
+    table.appendChild(headerRow);
+    const buildingNameCol = document.createElement("th");
+    buildingNameCol.innerHTML = "Building";
+    headerRow.appendChild(buildingNameCol);
+    const buildingLevelCol = document.createElement("th");
+    buildingLevelCol.innerHTML = "Current Level";
+    headerRow.appendChild(buildingLevelCol);
+    index = 0;
+    buildings.forEach(building => {
+        const row = document.createElement("tr");
+        table.appendChild(row);
+        const buildingNameCol = document.createElement("td");
+        buildingNameCol.innerHTML = building.type;
+        row.appendChild(buildingNameCol);
+        const buildingLevelCol = document.createElement("td");
+        row.appendChild(buildingLevelCol);
+        const buildingLevelTextfield = document.createElement("input");
+        buildingLevelTextfield.type = "number";
+        buildingLevelTextfield.id = "building" + index;
+        buildingLevelTextfield.value = levels[index] || 0;
+        building.level = levels[index] || 0;
+        buildingLevelTextfield.onchange = (() => {
+            saveVillage(villageName);
+            loadCurrentVillage(villageName);
+        });
+        buildingLevelCol.appendChild(buildingLevelTextfield);
+        index += 1;
+    });
+    oases = village.oases;
+    updateOasesDropdowns();
+    document.getElementById("isCapital").checked = village.isCapital || false;
+    document.getElementById("villageType").value = village.villageType || 0;
+    document.getElementById("content").innerHTML = '';
+};
+
+
+const updateCurrent = () => {
+    let villageType = document.getElementById("villageType").value;
+    const currentVillage = document.getElementById("villageSelector").value;
+    const existingVillage = villages.find(v => v.villageName === currentVillage);
+    if(existingVillage){
+        villageType = existingVillage.villageType;
+    }
+    setupBuildings(villageType);
+    loadCurrentVillage(currentVillage);
+}
+
+const removeVillage = () => {
+    const currentVillage = document.getElementById("villageSelector").value;
+    const existingVillage = villages.find(v => v.villageName === currentVillage);
+    if (existingVillage) {
+        const index = villages.indexOf(existingVillage);
+        villages.splice(index, 1);
+    }
+    localStorage.setItem("villages", JSON.stringify(villages));
+    loadVillages();
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
     const promises = filenames.map(loadJson);
@@ -232,4 +395,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         buildingData[key] = value;
     });
     document.getElementById("calculateButton").onclick = writeData;
+    document.getElementById("villageType").onchange = (() => {
+        saveVillage();
+        updateCurrent();
+    });
+    document.getElementById("villageSelector").onchange = updateCurrent;
+    document.getElementById("saveVillageButton").onclick = createVillage;
+    const oasisDropdowns = document.getElementById("oases").getElementsByTagName("select");
+    for (let oasisDropdown of oasisDropdowns){
+        oasisDropdown.onchange = saveVillage;
+    };
+    document.getElementById("isCapital").onchange = saveVillage;
+    document.getElementById("deleteVillageButton").onclick = removeVillage;
+
+    loadVillages();
+    updateCurrent();
 });

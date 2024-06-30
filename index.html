@@ -27,7 +27,36 @@
         </ul>
     </div>
     <h1>Calculator</h1>
-    <table>
+    <div id="villageInfo">
+        <label for="villageName">Village name:</label>
+        <input type="text" id="villageName"/>
+        <input id="saveVillageButton" type="button" value="Create"/>
+        <span id="warningText" style="color: red;"></span>
+        <br>
+        <label for="villageSelector">Select Village</label>
+        <select name="villageSelector" id="villageSelector">
+            <option value="" selected disabled hidden>Create a village first</option>
+        </select>
+        <input id="deleteVillageButton" type="button" value="Delete"/>
+    </div>
+    <input type="checkbox" id="isCapital" name="isCapital" checked />
+    <label for="isCapital">Is Capital?</label><br>
+    <label for="villageType">Village type:</label>
+    <select name="villageType" id="villageType">
+        <option value=0>Crop 15</option>
+        <option value=1>Crop 9</option>
+        <option value=2>Crop 7 no wood</option>
+        <option value=3>Crop 7 no clay</option>
+        <option value=4>Crop 7 no iron</option>
+        <option value=5>Crop 6</option>
+        <option value=6>Crop 6 wood no clay</option>
+        <option value=7>Crop 6 wood no iron</option>
+        <option value=8>Crop 6 clay no wood</option>
+        <option value=9>Crop 6 clay no iron</option>
+        <option value=10>Crop 6 iron no wood</option>
+        <option value=11>Crop 6 iron no clay</option>
+    </select>   
+    <table id="oases">
         <tr>
             <th>Oasis (in order)</th>
             <th>Wood</th>
@@ -132,23 +161,7 @@
             </th>
         </tr>
     </table>
-    <input type="checkbox" id="isCapital" name="isCapital" checked />
-    <label for="isCapital">Is Capital?</label><br>
-    <label for="villageType">Village type:</label>
-    <select name="villageType" id="villageType">
-        <option value=0>Crop 15</option>
-        <option value=1>Crop 9</option>
-        <option value=2>Crop 7 no wood</option>
-        <option value=3>Crop 7 no clay</option>
-        <option value=4>Crop 7 no iron</option>
-        <option value=5>Crop 6</option>
-        <option value=6>Crop 6 wood no clay</option>
-        <option value=7>Crop 6 wood no iron</option>
-        <option value=8>Crop 6 clay no wood</option>
-        <option value=9>Crop 6 clay no iron</option>
-        <option value=10>Crop 6 iron no wood</option>
-        <option value=11>Crop 6 iron no clay</option>
-    </select>
+    <div id="currentLevels"></div>
     <input id="calculateButton" type="button" value="Calculate" />
     <div id="content"></div>
 </body>
