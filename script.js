@@ -231,18 +231,56 @@ const writeData = () => {
 
     const buildingsStartingState = structuredClone(buildings);
     document.getElementById("content").innerHTML = '';
+    updateBuildConstraints();
     while (isThereAnyBuildingToUpgrade(buildings)) {
         const toUpgrade = getBuildingWithLowestPaybackPeriod(buildings);
         toUpgrade.level += 1;
-        if (toUpgrade.level === maxLevels[toUpgrade.type]) {
-            toUpgrade.canBeUpgraded = false;
-        }
         const buildingName = toUpgrade.type;
         const buildingLevel = buildingName === "Hero's Mansion" ? herosMansionMap[toUpgrade.level] : toUpgrade.level;
         content.innerHTML += `Upgrade ${buildingName} to ${buildingLevel}<br>`;
+        updateBuildConstraints();
     }
     buildings = buildingsStartingState;
 };
+
+const updateBuildConstraints = () => {
+    buildings.forEach(building => {
+        if(building.type == "Woodcutter" && building.level >= 10) {
+            const sawmill = buildings.find(b => b.type == "Sawmill");
+            if(sawmill.level < 5){
+                sawmill.canBeUpgraded = true;
+            }
+        }
+        if(building.type == "Clay Pit" && building.level >= 10) {
+            const brickyard = buildings.find(b => b.type == "Brickyard");
+            if(brickyard.level < 5){
+                brickyard.canBeUpgraded = true;
+            }
+        }
+        if(building.type == "Iron Mine" && building.level >= 10) {
+            const ironFoundry = buildings.find(b => b.type == "Iron Foundry");
+            if(ironFoundry.level < 5){
+                ironFoundry.canBeUpgraded = true;
+            }
+        }
+        if(building.type == "Cropland" && building.level >= 10) {
+            const mill = buildings.find(b => b.type == "Grain Mill");
+            if(mill.level < 5){
+                mill.canBeUpgraded = true;
+            }
+        }
+        if(building.type == "Grain Mill" && building.level == 5){
+            const bakery = buildings.find(b => b.type == "Bakery");
+            if(bakery.level < 5){
+                bakery.canBeUpgraded = true;
+            }
+        }
+
+        if(building.level == maxLevels[building.type]){
+            building.canBeUpgraded = false;
+        }
+    });
+}
 
 const saveVillage = (villageName) => {
     if(!villageName || typeof villageName != "string"){
