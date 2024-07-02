@@ -263,7 +263,7 @@ const updateBuildConstraints = () => {
                 ironFoundry.canBeUpgraded = true;
             }
         }
-        if(building.type == "Cropland" && building.level >= 10) {
+        if(building.type == "Cropland" && building.level >= 5) {
             const mill = buildings.find(b => b.type == "Grain Mill");
             if(mill.level < 5){
                 mill.canBeUpgraded = true;
